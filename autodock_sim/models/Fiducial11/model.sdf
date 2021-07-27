@@ -1,0 +1,37 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='Fiducial11'>
+
+    <link name='marker'>
+      <pose frame=''>0 0 0 0 0 3.14</pose>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.15 0.15 1e-5</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://Fiducial11/materials/scripts</uri>
+            <uri>model://Fiducial11/materials/textures</uri>
+            <name>Fiducial11/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <cast_shadows>1</cast_shadows>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+
+    <static>1</static>
+    <allow_auto_disable>1</allow_auto_disable>
+
+  </model>
+</sdf>

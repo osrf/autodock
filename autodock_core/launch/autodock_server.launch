@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="use_fake_clock" default="false" doc="Use this with Caution!!!!"/>
+  <arg name="autodock_config" default="$(find autodock_core)/configs/mock_robot.yaml"/>
+
+  <!-- Danger Zone!!! launch simple dock server with fake clock -->
+  <!-- Will need to remove this impl as faking sim clock is not a 'good' implementation -->
+  <group if="$(arg use_fake_clock)">
+    <node pkg="autodock_core" name="simple_autodock" type="simple_autodock.py" 
+          args="--server --rosparam --fake_clock" output="screen" respawn="false">
+      <rosparam command="load" file="$(arg autodock_config)" />
+    </node>
+  </group>
+
+  <!-- launch simple dock server  -->
+  <group unless="$(arg use_fake_clock)">
+    <node pkg="autodock_core" name="simple_autodock" type="simple_autodock.py" 
+          args="--server --rosparam" output="screen" respawn="false">
+      <rosparam command="load" file="$(arg autodock_config)" />
+    </node>
+  </group>
+
+</launch>

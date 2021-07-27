@@ -1,0 +1,13 @@
+material Fiducial11/Marker
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture 6x6_1000-11.png
+			}
+		}
+	}
+}

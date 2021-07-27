@@ -1,0 +1,33 @@
+<sdf version="1.4">
+  <world name="default">
+    <physics type="ode">
+      <max_step_size>0.002</max_step_size>
+      <real_time_update_rate>2000</real_time_update_rate>
+    </physics>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <light name='user_spot_light_0' type='spot'>
+      <pose>0 0 2 0 -0 0</pose>
+      <cast_shadows>0</cast_shadows>
+      <spot>
+        <inner_angle>0.6</inner_angle>
+        <outer_angle>1</outer_angle>
+        <falloff>1</falloff>
+      </spot>
+    </light>
+
+    <include>
+      <uri>model://MiniMockCharger</uri>
+      <name>charger_base1</name>
+      <pose>-0.5 0 0 0 0 0</pose>
+			<static>True</static>
+    </include>
+
+  </world>
+</sdf>

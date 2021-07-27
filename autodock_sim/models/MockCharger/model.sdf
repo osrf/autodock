@@ -1,0 +1,144 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='MockCharger'>
+    <allow_auto_disable>0</allow_auto_disable>
+    <static>0</static>
+
+    <!-- Charger Base: Offset to make sure origin is at bottom center-->
+    <link name='charger_base'>
+      <pose> -0.201 0 0.6 0 0 0</pose>
+
+      <collision name='collision'>
+        <geometry>
+          <box>
+            <size>.4 .8 1.2</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>.4 .8 1.2</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>.7 .7 .5 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0 0 0 0</emissive>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Experimental Charging station contact, For ChargingstationPlugin -->
+    <link name="charger_contact">
+      <pose> 0 0 0.8 0 0 0</pose>
+
+      <light name='charger_led' type='spot'>
+        <pose>0.1 0 0.7 0 0 0</pose>
+        <cast_shadows>0</cast_shadows>
+        <spot>
+          <inner_angle>0.6</inner_angle>
+          <outer_angle>1</outer_angle>
+          <falloff>1</falloff>
+        </spot>
+      </light>
+  
+      <collision name='charger_collision'>
+        <max_contacts>2</max_contacts>
+        <geometry>
+          <box>
+            <size>.06 .2 .2</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>.06 .2 .2</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>.7 0 0 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0 0 0 0</emissive>
+        </material>
+      </visual>
+
+      <!-- Publish contact info of the contact 'Box' to gz transport topic -->
+      <sensor name="charger_contactsensor" type="contact">
+        <always_on>true</always_on>
+        <update_rate>0.5</update_rate>
+        <contact>
+          <collision>charger_collision</collision>
+        </contact>
+        <plugin name="charging_station_plugin" filename="libContactPlugin.so"/>
+      </sensor>
+    </link>
+
+    <!-- Custom charging_station_plugin -->
+    <!-- features: retrieve contact info, light indicator, trigger ros srv server -->
+    <plugin name='charging_station_plugin' filename='libChargingStationPlugin.so'>
+      <enable>true</enable>
+      <light>
+        <id>charger_contact/charger_led</id>
+        <duration>1</duration>
+        <interval>1</interval>
+        <color>1 0.1 0</color>
+      </light>
+      <target_color>0 1 0</target_color>
+      <reset_timeout>15</reset_timeout>
+      <target_collision>mock_docking_robot::body::collision</target_collision>
+      <contact_topic>
+        /gazebo/default/charger_base1/charger_contact/charger_contactsensor/contacts
+      </contact_topic>
+    </plugin>
+
+    <!-- Offset -20cm from centre-->
+    <include>
+      <name>left_aruco_tag</name>
+      <uri>model://Fiducial10</uri>
+      <pose> 0 -0.2 0.2 0 -1.57 0.0</pose>
+      <static>true</static>
+    </include>
+
+    <!-- located at centre-->
+    <include>
+      <name>centre_aruco_tag</name>
+      <uri>model://Fiducial20</uri>
+      <pose> 0 0 0.2 -0 -1.57 0</pose>
+      <static>true</static>
+    </include>
+
+    <!-- Offset +20cm from centre-->
+    <include>
+      <name>right_aruco_tag</name>
+      <uri>model://Fiducial11</uri>
+      <pose> 0 0.2 0.2 -0 -1.57 0</pose>
+      <static>true</static>
+    </include>
+
+    <joint name="aruco_tag_joint1" type="fixed">
+      <parent>charger_base</parent>
+      <child>left_aruco_tag::marker</child>
+    </joint>
+
+    <joint name="aruco_tag_joint2" type="fixed">
+      <parent>charger_base</parent>
+      <child>centre_aruco_tag::marker</child>
+    </joint>
+
+    <joint name="aruco_tag_joint3" type="fixed">
+      <parent>charger_base</parent>
+      <child>right_aruco_tag::marker</child>
+    </joint>
+
+    <joint name="charger_contact_joint" type="fixed">
+      <parent>charger_base</parent>
+      <child>charger_contact</child>
+    </joint>
+  </model>
+</sdf>

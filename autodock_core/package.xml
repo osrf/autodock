@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>autodock_core</name>
+  <version>0.2.0</version>
+  <description> Auto docking package</description>
+  <maintainer email="youliang@openrobotics.com">You Liang</maintainer>
+  <license>BSD</license>
+
+  <author>You Liang</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf2_ros</run_depend>
+  <run_depend>aruco_detect</run_depend>
+  <run_depend>actionlib</run_depend>
+  <run_depend>message_runtime</run_depend>
+
+</package>
