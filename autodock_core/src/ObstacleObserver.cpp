@@ -26,7 +26,7 @@
 using AutoDockFeedbackMsg = autodock_core::AutoDockingActionFeedback;
 using FeedbackStateMsg = autodock_core::AutoDockingFeedback;
 
-class ObstableObserver
+class ObstacleObserver
 {
 // This simple obstacle observer node checks if any obstacle is near to the 
 // vicinity of the robot. This mainly serves as a safety node for the current
@@ -35,7 +35,7 @@ class ObstableObserver
 // we will activate the pausing capability, so prevent robot stoping when it
 // is near the charging station.
 public:
-  ObstableObserver(ros::NodeHandle nh) : nh_(nh)
+  ObstacleObserver(ros::NodeHandle nh) : nh_(nh)
 {
   pause_dock_pub_ = nh_.advertise<std_msgs::Bool>("/pause_dock", 3000);
 
@@ -44,15 +44,15 @@ public:
 
   costmap_sub_ = nh_.subscribe(
       "/move_base/global_costmap/local_costmap", 100,
-      &ObstableObserver::costmap_cb, this);
+      &ObstacleObserver::costmap_cb, this);
 
   autodock_feedback_sub_ = nh_.subscribe(
       "/autodock_action/feedback", 100,
-      &ObstableObserver::autodock_feedback_cb, this);
+      &ObstacleObserver::autodock_feedback_cb, this);
 
   /// Default rate: 3.33 hz
   ros_timer_ = nh_.createTimer(
-      ros::Duration(0.3), &ObstableObserver::periodic_pub_cb, this);
+      ros::Duration(0.3), &ObstacleObserver::periodic_pub_cb, this);
 
   /// Get all rosparams
   /// Pause when occupied pixels are within the vicinity radius (meters)
@@ -78,7 +78,7 @@ public:
     point.y = vicinity_radius_ * sin(rad);
     vicinity_msg_.polygon.points.push_back(point);
   }
-  ROS_INFO("Done Initialize Obstable Observer Node");
+  ROS_INFO("Done Initialize Obstacle Observer Node");
 }
 
 void costmap_cb(
@@ -190,6 +190,6 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "obstacle_observer");
   std::cout << "Running Obstatcle Observer Node" << std::endl;
   ros::NodeHandle nh("~");
-  ObstableObserver dock_server(nh);
+  ObstacleObserver dock_server(nh);
   ros::spin();
 }
