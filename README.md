@@ -1,5 +1,7 @@
 # autodock
 
+![](https://github.com/osrf/autodock/workflows/ci/badge.svg)
+
 ROS packages for automatic docking
 
 `autodock` a state machine based auto docking solution for differential-drive robot,
@@ -151,7 +153,6 @@ docker run -it --network host osrf/autodock:v1 bash -c "$COMMAND"
 > The initial development of this code was graciously supported by [Kabam Robotics (aka Cognicept)](https://github.com/cognicept-admin).
 
 ### Future Work
- - git action with integration test
  - Advance `ObstacleObserver`: filter occupancy of charging station on costmap.
 
 ### Stray Commands 
