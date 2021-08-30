@@ -45,8 +45,8 @@
   </include>
 
   <!-- obstacle observer node  -->
-  <node type="obstable_observer"
-        name="obstable_observer" pkg="autodock_core" output="screen">
+  <node type="obstacle_observer"
+        name="obstacle_observer" pkg="autodock_core" output="screen">
     <param name="vicinity_radius" value="0.16"/>
     <param name="coverage_percent" value="0.35"/>
     <param name="occupancy_prob" value="70"/>

@@ -28,12 +28,12 @@ install(DIRECTORY launch/
 
 ## autodock obstacle observer
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(obstable_observer src/ObstacleObserver.cpp)
-target_link_libraries(obstable_observer ${catkin_LIBRARIES})
-add_dependencies( obstable_observer
+add_executable(obstacle_observer src/ObstacleObserver.cpp)
+target_link_libraries(obstacle_observer ${catkin_LIBRARIES})
+add_dependencies( obstacle_observer
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-install(TARGETS obstable_observer
+install(TARGETS obstacle_observer
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
