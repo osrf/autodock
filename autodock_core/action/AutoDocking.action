@@ -1,0 +1,37 @@
+######################################################################
+# GOAL
+## docking waypoint heading to the charging station
+string docking_waypoint
+
+---
+######################################################################
+# RESULT
+
+## if docking succeed
+bool is_success
+
+## verbose description of the result
+string status
+
+---
+######################################################################
+# FEEDBACK
+
+## progress approx, 0 - 1.0 
+float32 progress
+
+## verbose description of the progress
+string status
+
+## state
+uint8 STATE_INVALID = 0
+uint8 STATE_IDLE = 1
+uint8 STATE_PREDOCK = 2
+uint8 STATE_PARALLEL_CORRECTION = 3
+uint8 STATE_STEER_DOCK = 4
+uint8 STATE_LAST_MILE = 5
+uint8 STATE_ACTIVATE_CHARGER = 6
+uint8 STATE_RETRY = 7
+uint8 STATE_PAUSE = 8
+
+uint8 state

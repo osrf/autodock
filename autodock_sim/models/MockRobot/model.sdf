@@ -1,0 +1,328 @@
+<?xml version="1.0"?>
+
+<sdf version="1.6">
+  <model name="MockRobot">
+
+    <plugin name="mock_robot_diff_controller" filename="libgazebo_ros_diff_drive.so">
+      <robotNamespace>/</robotNamespace>
+      <always_on>true</always_on>
+      <!-- Update rate -->
+      <updateRate>10.0</updateRate>
+      <!-- wheels -->
+      <leftJoint>joint_tire_left</leftJoint>
+      <rightJoint>joint_tire_right</rightJoint>
+      <!-- kinematics -->
+      <wheelSeparation>0.42</wheelSeparation>
+      <wheelDiameter>1.22</wheelDiameter>
+      <!-- limits -->
+      <wheelTorque>150</wheelTorque>
+      <wheelAcceleration>0.5</wheelAcceleration>
+      <!-- output -->
+      <publishOdom>true</publishOdom>
+      <publishWheelTF>false</publishWheelTF>
+      <odometryFrame>odom</odometryFrame>
+      <publishWheelTF>chassis</publishWheelTF>
+    </plugin>
+
+    <!-- Camera -->
+    <link name="camera_link">
+      <pose> -0.35 0 .2 0 0 3.14</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>.10</ixx>
+          <iyy>.10</iyy>
+          <izz>.30</izz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <geometry>
+          <box>
+            <size>0.03 0.2 0.03</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.03 0.2 0.03</size>
+          </box>
+        </geometry>
+        
+        <material>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0 0 0 0</emissive>
+        </material>
+      </visual>
+
+      <!-- camera plugin -->
+      <!-- refered to realsense rgb camera profile -->
+      <sensor type="camera" name="camera1">
+        <update_rate>10.0</update_rate>
+        <camera name="head">
+          <horizontal_fov>1.204</horizontal_fov>
+          <image>
+            <!-- <width>1920</width>
+              <height>1080</height> -->
+              <!-- Will use a lower res than the actual camera resolution,
+              while maintaining the same ratio. This is to assist gazebo
+              camera plugin to publish the camera frame at the higher
+              rate of 10hz, while maintaining the physics rate. -->
+              <width>711</width>
+              <height>400</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise is sampled independently per pixel on each frame.
+                That pixel's noise value is added to each of its color
+                channels, which at that point lie in the range [0,1]. -->
+            <mean>0.0</mean>
+            <stddev>0.02</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>/camera/color</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>camera_link</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </link>
+
+    <link name="body">
+      <pose>0 0 0 0 0 0</pose>
+
+      <inertial>
+        <pose>0 0 0.693 0 0 0</pose>
+        <mass>170</mass>
+        <inertia>
+          <ixx>34.6605</ixx>
+          <iyy>32.8369</iyy>
+          <izz>13.0691</izz>
+        </inertia>
+      </inertial>
+
+      <collision name="collision">
+        <pose>0 0 0.7 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.7 0.7 1.4</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <torsional>
+              <coefficient>0.0</coefficient>
+            </torsional>
+            <ode>
+              <mu>0.0</mu>
+              <mu2>0.0</mu2>
+            </ode>
+            <bullet>
+              <friction>0.0</friction>
+              <friction2>0.0</friction2>
+              <rolling_friction>0.0</rolling_friction>
+            </bullet>
+          </friction>
+        </surface>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/MockRobot.obj</uri></mesh>
+        </geometry>
+      </visual>
+      <visual name="front_wheel_left">
+      <pose>.17 -.21 .03 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/SmallWheel.obj</uri></mesh>
+        </geometry>
+      </visual>
+      <visual name="back_wheel_left">
+      <pose>-.24 -.21 .03 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/SmallWheel.obj</uri></mesh>
+        </geometry>
+      </visual>
+      <visual name="front_wheel_right">
+      <pose>.17 .21 .03 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/SmallWheel.obj</uri></mesh>
+        </geometry>
+      </visual>
+      <visual name="back_wheel_right">
+      <pose>-.24 .21 .03 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/SmallWheel.obj</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <link name="suspension_tire_left">
+      <!-- This is a dummy link that's used to connect a suspension (prismatic
+           joint) to the tire axis (revolute joint) -->
+      <pose>0 .21 .06 0 0 0</pose>
+      <inertial>
+        <mass>1.00</mass>
+        <inertia>
+          <ixx>1.00</ixx>
+          <iyy>1.00</iyy>
+          <izz>1.00</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <joint name="joint_suspension_tire_left" type="prismatic">
+      <parent>body</parent>
+      <child>suspension_tire_left</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics>
+          <damping>500</damping>
+          <spring_reference>-0.05</spring_reference>
+          <spring_stiffness>2000</spring_stiffness>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>true</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+    <link name="tire_left">
+      <pose>0 .21 .06 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>5.0</mass>
+        <inertia>
+          <ixx>0.757897446874</ixx>
+          <iyy>1.302975553365</iyy>
+          <izz>0.757897446874</izz>
+        </inertia>
+      </inertial>
+      <visual name="fat_wheel_left">
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/FatWheel.obj</uri></mesh>
+        </geometry>
+      </visual>
+      <collision name="tire_left">
+        <geometry>
+          <sphere><radius>0.06137</radius></sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>10000000.0</kp>
+              <kd>1.0</kd>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+
+    <joint name="joint_tire_left" type="revolute">
+      <parent>suspension_tire_left</parent>
+      <child>tire_left</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
+
+    <link name="suspension_tire_right">
+      <!-- This is a dummy link that's used to connect a suspension (prismatic
+           joint) to the tire axis (revolute joint) -->
+      <pose>0 -.21 .06 0 0 0</pose>
+      <inertial>
+        <mass>1.00</mass>
+        <inertia>
+          <ixx>1.00</ixx>
+          <iyy>1.00</iyy>
+          <izz>1.00</izz>
+        </inertia>
+      </inertial>
+    </link>
+
+    <joint name="joint_suspension_tire_right" type="prismatic">
+      <parent>body</parent>
+      <child>suspension_tire_right</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <dynamics>
+          <damping>500</damping>
+          <spring_reference>-0.05</spring_reference>
+          <spring_stiffness>2000</spring_stiffness>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>true</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+    <link name="tire_right">
+      <pose>0 -.21 .06 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>5.0</mass>
+        <inertia>
+          <ixx>0.757897446874</ixx>
+          <iyy>1.302975553365</iyy>
+          <izz>0.757897446874</izz>
+        </inertia>
+      </inertial>
+      <visual name="fat_wheel_right">
+        <geometry>
+          <mesh><uri>model://MockRobot/meshes/FatWheel.obj</uri></mesh>
+        </geometry>
+      </visual>
+      <collision name="tire_right">
+        <geometry>
+          <sphere><radius>0.06137</radius></sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>10000000.0</kp>
+              <kd>1.0</kd>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+
+    <joint name="joint_tire_right" type="revolute">
+      <parent>suspension_tire_right</parent>
+      <child>tire_right</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="camera_joint" type="fixed">
+      <parent>body</parent>
+      <child>camera_link</child>
+      <axis>
+        <xyz>0 0 2</xyz>
+      </axis>
+    </joint>
+
+  </model>
+</sdf>

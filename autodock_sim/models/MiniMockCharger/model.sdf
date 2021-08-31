@@ -1,0 +1,116 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='MiniMockCharger'>
+    <allow_auto_disable>0</allow_auto_disable>
+    <static>0</static>
+
+    <!-- Charger Base: Offset to make sure origin is at bottom center-->
+    <link name='charger_base'>
+      <pose> -0.051 0 0.2 0 0 0</pose>
+
+      <collision name='collision'>
+        <geometry>
+          <box>
+            <size>.1 .5 0.4</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>.1 .5 0.4</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>.8 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0.3 0.3 0.3 0</emissive>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Offset -10cm from centre-->
+    <link name='left_marker'>
+      <pose> 0 -0.1 0.13 -0 -1.57 3.14</pose>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.1 0.1 1e-5</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://Fiducial10/materials/scripts</uri>
+            <uri>model://Fiducial10/materials/textures</uri>
+            <name>Fiducial10/Marker</name>
+          </script>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+        </material>
+      </visual>
+    </link>
+
+    <link name='centre_marker'>
+      <pose> 0 0 0.13 -0 -1.57 3.14</pose>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.04 0.04 1e-5</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://Fiducial20/materials/scripts</uri>
+            <uri>model://Fiducial20/materials/textures</uri>
+            <name>Fiducial20/Marker</name>
+          </script>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Offset +10cm from centre-->
+    <link name='right_marker'>
+      <pose> 0 0.1 0.13 -0 -1.57 3.14</pose>
+      <visual name='visual'>
+        <geometry>
+          <box>
+            <size>0.1 0.1 1e-5</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://Fiducial11/materials/scripts</uri>
+            <uri>model://Fiducial11/materials/textures</uri>
+            <name>Fiducial11/Marker</name>
+          </script>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="aruco_tag_joint1" type="fixed">
+      <parent>charger_base</parent>
+      <child>left_marker</child>
+    </joint>
+
+    <joint name="aruco_tag_joint2" type="fixed">
+      <parent>charger_base</parent>
+      <child>centre_marker</child>
+    </joint>
+
+    <joint name="aruco_tag_joint3" type="fixed">
+      <parent>charger_base</parent>
+      <child>right_marker</child>
+    </joint>
+
+    <joint name="charger_contact_joint" type="fixed">
+      <parent>charger_base</parent>
+      <child>charger_contact</child>
+    </joint>
+  </model>
+</sdf>

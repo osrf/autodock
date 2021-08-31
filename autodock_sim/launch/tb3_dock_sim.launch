@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Global param -->
+  <arg name="autodock_server" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+
+  <!-- Spawn tb3 pose -->
+  <arg name="x_pos" default="0.1"/>
+  <arg name="y_pos" default="-0.05"/>
+  <arg name="yaw" default="3.14"/>
+
+  <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+
+  <!-- Launch AutoDock Server Node -->
+  <group if="$(arg autodock_server)">
+    <include file="$(find autodock_core)/launch/autodock_server.launch">
+      <arg name="autodock_config" default="$(find autodock_examples)/configs/turtlebot3.yaml"/>
+    </include>
+  </group>
+
+  <!-- launch fiducial detect  -->
+  <node pkg="aruco_detect" name="aruco_detect"
+        type="aruco_detect" output="log" respawn="false">
+    <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+    <param name="image_transport" value="compressed"/>
+    <param name="publish_images" value="true" />
+    <param name="dictionary" value="8"/>
+    <param name="do_pose_estimation" value="true"/>
+    <param name="verbose" value="false"/>
+    <param name="fiducial_len_override" value="10: 0.1, 11: 0.1, 20: 0.04"/>
+    <remap from="camera/compressed" to="camera/image/compressed"/>
+    <remap from="camera_info" to="camera/camera_info"/>
+  </node>
+
+  <!-- Launch Simulation World -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="$(find autodock_sim)/worlds/tb3_charging.world"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <env name="GAZEBO_MODEL_PATH" value="$(find autodock_sim)/models" />    
+  </include>
+  
+  <!-- spawn turtlebot3 with camera -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_burger_for_autorace.urdf.xacro"/>
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"
+        args="-urdf -model turtlebot3_burger -x $(arg x_pos) -y $(arg y_pos) -Y $(arg yaw) -param robot_description" />
+
+  <!-- tf from robot base to camera -->
+  <!-- slightly "roll" more than 90 degress as the camera is tilted downwards -->
+  <node pkg="tf2_ros" 
+        type="static_transform_publisher"
+        name="link1_broadcaster"
+        args="0.04 0 .16 -1.57 0 -1.67 base_footprint camera_rgb_optical_frame"/>
+
+  <!-- rviz viewer -->
+  <node type="rviz" 
+        name="rviz"
+        pkg="rviz"
+        args="-d $(find autodock_examples)/rviz/default.rviz" />
+</launch>

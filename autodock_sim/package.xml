@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>autodock_sim</name>
+  <version>2.5.21</version>
+  <description>
+    Simulation and launch files for autodock
+  </description>
+
+  <maintainer email="youliang@osrfoundation.org">You Liang</maintainer>
+
+  <license>Apache 2.0</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>gazebo_dev</build_depend>
+
+  <exec_depend>aruco_detect</exec_depend>
+  <exec_depend>autodock_core</exec_depend>
+  <exec_depend>gazebo_dev</exec_depend>
+
+  <depend>gazebo_msgs</depend>
+  <depend>roslib</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>std_srvs</depend>
+  <depend>rosgraph_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+</package>

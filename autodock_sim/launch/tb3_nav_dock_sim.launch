@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Global param -->
+  <arg name="autodock_server" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+
+  <!-- Spawn tb3 pose -->
+  <arg name="x_pos" default="0.5"/>
+  <arg name="y_pos" default="-0.05"/>
+  <arg name="yaw" default="0"/>
+
+  <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+  <!-- This is to ensure that the costmap is constantly and fully published to the topic -->
+  <param name="/move_base/local_costmap/always_send_full_costmap" value="true"/>
+
+  <!-- Launch AutoDock Server Node -->
+  <group if="$(arg autodock_server)">
+    <include file="$(find autodock_core)/launch/autodock_server.launch">
+      <arg name="autodock_config" default="$(find autodock_examples)/configs/turtlebot3.yaml"/>
+    </include>
+  </group>
+
+  <!-- launch fiducial detect  -->
+  <node pkg="aruco_detect" name="aruco_detect"
+        type="aruco_detect" output="log" respawn="false">
+    <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+    <param name="image_transport" value="compressed"/>
+    <param name="publish_images" value="true" />
+    <param name="dictionary" value="8"/>
+    <param name="do_pose_estimation" value="true"/>
+    <param name="verbose" value="false"/>
+    <param name="fiducial_len_override" value="10: 0.1, 11: 0.1, 20: 0.04"/>
+    <remap from="camera/compressed" to="camera/image/compressed"/>
+    <remap from="camera_info" to="camera/camera_info"/>
+  </node>
+
+  <!-- Launch Simulation World -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <env name="GAZEBO_MODEL_PATH" value="$(find autodock_sim)/models" />    
+  </include>
+
+  <!-- obstacle observer node  -->
+  <node type="obstacle_observer"
+        name="obstacle_observer" pkg="autodock_core" output="screen">
+    <param name="vicinity_radius" value="0.16"/>
+    <param name="coverage_percent" value="0.35"/>
+    <param name="occupancy_prob" value="70"/>
+    <param name="base_link_name" value="base_link"/>
+    <remap from="/move_base/global_costmap/local_costmap" to="/move_base/local_costmap/costmap"/>
+  </node>
+
+  <!-- spawn turtlebot3 with camera -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_burger_for_autorace.urdf.xacro"/>
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"
+        args="-urdf -model turtlebot3_burger -x $(arg x_pos) -y $(arg y_pos) -Y $(arg yaw) -param robot_description" />
+
+  <!-- spawn the mini mock charger -->
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_model"
+        args="-sdf -database MiniMockCharger -model charger -y 0.5" />
+
+  <!-- tf from robot base to camera -->
+  <!-- slightly "roll" more than 90 degress as the camera is tilted downwards -->
+  <node pkg="tf2_ros" 
+        type="static_transform_publisher"
+        name="link1_broadcaster"
+        args="0.04 0 .16 -1.57 0 -1.67 base_footprint camera_rgb_optical_frame"/>
+
+  <!-- rviz viewer -->
+  <node type="rviz" 
+        name="rviz"
+        pkg="rviz"
+        args="-d $(find autodock_examples)/rviz/tb3_nav.rviz" />
+</launch>

@@ -1,0 +1,60 @@
+# Gazebo Simulation robot
+
+##############################################################################
+# Frame Ids
+
+base_link : "base_footprint"
+left_marker: "fiducial_10"
+centre_marker: "fiducial_20"
+right_marker: "fiducial_11"
+
+##############################################################################
+# Vel profiles
+
+# the upper lower limit of the cmd_vel output
+linear_vel_range: [-0.8, 0.8]
+angular_vel_range: [-0.13, 0.13]
+
+# Absolute vel profile
+# min (ang and linear) vel here means the min cmd_vel before the robot stalls
+max_linear_vel: 0.05         # m/s, for parallel.c and steer
+min_linear_vel: 0.02        # m/s, for lastmile
+max_angular_vel: 0.13       # rad/s
+min_angular_vel: 0.05       # rad/s
+
+##############################################################################
+# General Configs
+
+cam_offset: 0.04          # camera to base link
+stop_yaw_diff: 0.03        # radian
+stop_trans_diff: 0.02      # meters
+tf_expiry: 0.5             # sec
+controller_rate: 4.0       # hz
+dock_timeout: 220          # sec
+front_dock: true           # turtlebot "charging point" is located in front
+
+##############################################################################
+# Predock State
+
+max_parallel_offset: 0.10     # m, will move to parallel.c if exceeded
+predock_tf_samples: 3         # tf samples to avg, parallel.c validation
+
+##############################################################################
+# Steer Dock State
+
+to_last_mile_dis: 0.3         # edge2edge distance where transition to LM
+to_last_mile_tol: 0.1         # transition tolerance from SD to LM
+# Determine how "rigorous" we want the robot to correct itself during steer dock
+offset_to_angular_vel: 1.1    # multiplier factor to convert y-offset to ang vel
+
+##############################################################################
+# Last mile State
+
+max_last_mile_odom: 0.20    # max last mile odom move without using marker
+stop_distance: 0.08        # edge2edge distance to stop from charger
+
+##############################################################################
+# Activate Charger
+
+enable_charger_srv: False   # whether to activate charger after last mile
+check_battery_status: False # check if battery status is POWER_SUPPLY_STATUS_CHARGING
