@@ -38,6 +38,10 @@ namespace gazebo
     using TriggerReq = std_srvs::Trigger::Request;
     using TriggerRes = std_srvs::Trigger::Response;
 
+    ChargingStationPlugin() :
+      charging_led_on_(false)
+    {}
+
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // Store the pointer to the model
@@ -63,13 +67,13 @@ namespace gazebo
     void OnUpdate()
     {
       FlashLightPlugin::OnUpdate();
-      if (charging_led_on &&
+      if (charging_led_on_ &&
           ((ros::Time::now() - trigger_charger_time_).sec > param_.reset_timeout))
       {
         ROS_INFO("Switch back to original charging led color");
         this->ChangeColor(
             param_.light_name, param_.light_link_name, param_.original_color);
-        charging_led_on = false;
+        charging_led_on_ = false;
       }
     }
 
@@ -130,15 +134,15 @@ namespace gazebo
       // check if there's any contact,
       // and check if collision is as defined target
       if (_msg->contact().size() != 0 &&
-          (param_.target_collision == _msg->contact()[0].collision2()))
+          (param_.target_collision == _msg->contact().Get(0).collision2()))
       {
         // update collision time as this is a valid one
         last_collision_time_ = ros::Time::now();
         // TODO check if body_1_wrench force (x) exceeds a threshhold
-        last_collision_verbose_msg_ = _msg->contact()[0].DebugString();
+        last_collision_verbose_msg_ = _msg->contact().Get(0).DebugString();
 
         last_collision_x_wrench = 0.0;
-        for (const auto wrench : _msg->contact()[0].wrench())
+        for (const auto wrench : _msg->contact().Get(0).wrench())
         {
           last_collision_x_wrench += wrench.body_1_wrench().force().x();
         }
@@ -158,7 +162,7 @@ namespace gazebo
     std::string last_collision_verbose_msg_;
     double last_collision_x_wrench;
     ros::Time trigger_charger_time_;
-    std::atomic<bool> charging_led_on = false;
+    std::atomic<bool> charging_led_on_;
 
     struct PluginParam
     {
@@ -197,7 +201,7 @@ namespace gazebo
             param_.light_name, param_.light_link_name, param_.target_color);
         res.message = "valid contact with robot, total x wrench force: " +
                       std::to_string(last_collision_x_wrench) + " N";
-        charging_led_on = true;
+        charging_led_on_ = true;
         res.success = true;
       }
       return true;
