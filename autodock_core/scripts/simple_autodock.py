@@ -141,6 +141,7 @@ class AutoDockStateMachine(AutoDockServer):
         """
         rospy.loginfo("Start Docking Action Now")
         self.init_params()
+        self.set_aruco_detections(detection_state=True)
         rospy.sleep(self.sleep_period)
 
         current_retry_count = 0
@@ -156,6 +157,7 @@ class AutoDockStateMachine(AutoDockServer):
             ):
                 self.publish_cmd()
                 self.set_state(DockState.IDLE, "All Success!")
+                self.set_aruco_detections(detection_state=False)
                 return True
 
             # If Dock failed
@@ -164,10 +166,12 @@ class AutoDockStateMachine(AutoDockServer):
 
             # Break from a retry
             if(current_retry_count >= self.cfg.retry_count):
+                self.set_aruco_detections(detection_state=False)
                 break
 
             # check again if it failed because of canceled
             if self.check_cancel():
+                self.set_aruco_detections(detection_state=False)
                 break
 
             # Attempt a Retry
@@ -177,6 +181,7 @@ class AutoDockStateMachine(AutoDockServer):
 
             if not self.do_retry():
                 rospy.logwarn("Not able to retry")
+                self.set_aruco_detections(detection_state=False)
                 break
 
         # Note: will not set_state IDLE here since we will wish to capture
