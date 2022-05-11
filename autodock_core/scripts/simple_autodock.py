@@ -172,7 +172,7 @@ class AutoDockStateMachine(AutoDockServer):
 
             # Attempt a Retry
             current_retry_count += 1
-            rospy.logwarn("Attemping retry: "
+            rospy.logwarn("Attempting retry: "
                           f"{current_retry_count}/{self.cfg.retry_count}")
 
             if not self.do_retry():
@@ -270,7 +270,7 @@ class AutoDockStateMachine(AutoDockServer):
 
         # start predock loop
         _pose_list = []
-        rospy.loginfo("Both Markers are detected, runnning predock loop")
+        rospy.loginfo("Both Markers are detected, running predock loop")
         while not rospy.is_shutdown():
             if self.check_cancel():
                 return False
@@ -282,7 +282,7 @@ class AutoDockStateMachine(AutoDockServer):
             centre_tf = self.get_centre_of_side_markers()
 
             if centre_tf is None:
-                rospy.logerr("Not detecting two sides marker, exit state")
+                rospy.logerr("Not detecting two side markers, exit state")
                 return False
 
             if self.cfg.front_dock:
@@ -308,7 +308,7 @@ class AutoDockStateMachine(AutoDockServer):
                     y_offset *= -1
                 _pose_list = []
 
-                # if robot y axis is way off, we will do parellel correction
+                # if robot y axis is way off, we will do parallel correction
                 # after this, will repeat predock
                 if abs(y_offset) > self.cfg.max_parallel_offset:
                     if not self.do_parallel_correction(y_offset):
