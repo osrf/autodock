@@ -17,8 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   LIBRARIES
-    gazebo_ros_api_plugin
-    gazebo_ros_paths_plugin
+    ChargingStationPlugin
 
   CATKIN_DEPENDS
     roslib
@@ -55,9 +54,7 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 # build charging station plugin
 add_library(ChargingStationPlugin SHARED src/ChargingStationPlugin.cpp)
-target_link_libraries(
-  ChargingStationPlugin
-  FlashLightPlugin
+target_link_libraries(ChargingStationPlugin
   ${GAZEBO_LIBRARIES}
   ${catkin_LIBRARIES})
   
