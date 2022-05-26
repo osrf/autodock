@@ -352,10 +352,10 @@ class AutoDockServer:
         try:
             rospy.wait_for_service('/enable_detections', timeout=3.0)
             resp = self.__enable_detections_srv(detection_state)
-            print("Enable detections response: ", resp.message)
+            rospy.loginfo("Enable detections response: " + resp.message)
             return resp.success
         except rospy.ServiceException as e:
-            print("Service call failed: %s"%e)
+            rospy.logerr("Service call failed: " + str(e))
 
     def __pause_dock_cb(self, msg):
         self.is_pause = msg.data
