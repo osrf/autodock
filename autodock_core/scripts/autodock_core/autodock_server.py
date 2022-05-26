@@ -60,6 +60,8 @@ class AutoDockConfig:
     # stop thresh
     stop_yaw_diff: float         # radian
     stop_trans_diff: float      # meters
+    # debug state
+    debug_mode: bool
 
 ##############################################################################
 ##############################################################################
@@ -95,9 +97,10 @@ class AutoDockServer:
         # create_subscriber to pause dock
         rospy.Subscriber("/pause_dock", Bool, self.__pause_dock_cb)
 
-        # debug timer
-        self.__marker_pub = rospy.Publisher('/sm_maker', Marker, queue_size=1)
-        self.__timer = rospy.Timer(rospy.Duration(0.5), self.__timer_cb)
+        # debug timer for state machine marker
+        if self.cfg.debug_mode:
+            self.__marker_pub = rospy.Publisher('/sm_maker', Marker, queue_size=1)
+            self.__timer = rospy.Timer(rospy.Duration(0.5), self.__timer_cb)
         self.is_pause = False # TODO
 
         self.dock_state = DockState.INVALID
@@ -349,13 +352,16 @@ class AutoDockServer:
         Set aruco detections to True or False
         :return : success
         """
-        try:
-            rospy.wait_for_service('/enable_detections', timeout=3.0)
-            resp = self.__enable_detections_srv(detection_state)
-            rospy.loginfo("Enable detections response: " + resp.message)
-            return resp.success
-        except rospy.ServiceException as e:
-            rospy.logerr("Service call failed: " + str(e))
+        if self.cfg.debug_mode:
+            return True
+        else:
+            try:
+                rospy.wait_for_service('/enable_detections', timeout=3.0)
+                resp = self.__enable_detections_srv(detection_state)
+                rospy.loginfo("Enable detections response: " + resp.message)
+                return resp.success
+            except rospy.ServiceException as e:
+                rospy.logerr("Service call failed: " + str(e))
 
     def __pause_dock_cb(self, msg):
         self.is_pause = msg.data

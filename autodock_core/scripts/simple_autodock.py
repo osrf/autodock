@@ -84,6 +84,10 @@ class DefaultAutoDockConfig(AutoDockConfig):
     retry_count = 1             # how many times to retry
     retry_retreat_dis = 0.4     # meters, distance retreat during retry
 
+    # debug state
+    debug_mode = True           # when False selectively turns on aruco detections only
+                                # a valid action is in progress.
+
 
 class AutoDockStateMachine(AutoDockServer):
     """

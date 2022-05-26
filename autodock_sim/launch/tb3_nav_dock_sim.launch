@@ -3,6 +3,7 @@
   <!-- Global param -->
   <arg name="autodock_server" default="true"/>
   <arg name="use_sim_time" default="true"/>
+  <arg name="debug_mode" default="true" doc="Use this to have aruco detections always ON (publish fiducial images always) and other useful visualization markers. Turn OFF for better performance in deployment."/>
 
   <!-- Spawn tb3 pose -->
   <arg name="x_pos" default="0.5"/>
@@ -17,6 +18,7 @@
   <group if="$(arg autodock_server)">
     <include file="$(find autodock_core)/launch/autodock_server.launch">
       <arg name="autodock_config" default="$(find autodock_examples)/configs/turtlebot3.yaml"/>
+      <arg name="debug_mode" value="$(arg debug_mode)" />
     </include>
   </group>
 

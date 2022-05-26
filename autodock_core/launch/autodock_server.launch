@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="use_fake_clock" default="false" doc="Use this with Caution!!!!"/>
+  <arg name="debug_mode" default="true" doc="Use this to have aruco detections always ON (publish fiducial images always) and other useful visualization markers. Turn OFF for better performance in deployment."/>
   <arg name="autodock_config" default="$(find autodock_core)/configs/mock_robot.yaml"/>
 
   <!-- Danger Zone!!! launch simple dock server with fake clock -->
@@ -9,6 +10,7 @@
     <node pkg="autodock_core" name="simple_autodock" type="simple_autodock.py" 
           args="--server --rosparam --fake_clock" output="screen" respawn="false">
       <rosparam command="load" file="$(arg autodock_config)" />
+      <param name="debug_mode" value="$(arg debug_mode)"/>
     </node>
   </group>
 
@@ -17,6 +19,7 @@
     <node pkg="autodock_core" name="simple_autodock" type="simple_autodock.py" 
           args="--server --rosparam" output="screen" respawn="false">
       <rosparam command="load" file="$(arg autodock_config)" />
+      <param name="debug_mode" value="$(arg debug_mode)"/>
     </node>
   </group>
 
