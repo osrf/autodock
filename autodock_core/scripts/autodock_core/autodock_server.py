@@ -32,6 +32,7 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import Bool
 from autodock_core.msg import AutoDockingAction, AutoDockingFeedback
 from autodock_core.msg import AutoDockingGoal, AutoDockingResult
+from std_srvs.srv import SetBool
 
 
 ##############################################################################
@@ -59,6 +60,8 @@ class AutoDockConfig:
     # stop thresh
     stop_yaw_diff: float         # radian
     stop_trans_diff: float      # meters
+    # debug state
+    debug_mode: bool
 
 ##############################################################################
 ##############################################################################
@@ -94,14 +97,22 @@ class AutoDockServer:
         # create_subscriber to pause dock
         rospy.Subscriber("/pause_dock", Bool, self.__pause_dock_cb)
 
-        # debug timer
-        self.__marker_pub = rospy.Publisher('/sm_maker', Marker, queue_size=1)
-        self.__timer = rospy.Timer(rospy.Duration(0.5), self.__timer_cb)
+        # debug timer for state machine marker
+        if self.cfg.debug_mode:
+            self.__marker_pub = rospy.Publisher('/sm_maker', Marker, queue_size=1)
+            self.__timer = rospy.Timer(rospy.Duration(0.5), self.__timer_cb)
         self.is_pause = False # TODO
 
         self.dock_state = DockState.INVALID
         self.start_time = rospy.Time.now()
         self.sleep_period = rospy.Duration(1/self.cfg.controller_rate)
+
+        # create service client to 
+        # 1. enable aruco detections only when action is started
+        # 2. disable aruco detections when action is idle
+        self.__enable_detections_srv = rospy.ServiceProxy('/enable_detections', SetBool)
+        # disable on initialize
+        self.set_aruco_detections(detection_state=False)
 
         if run_server:
             self.__as = actionlib.SimpleActionServer(
@@ -335,6 +346,22 @@ class AutoDockServer:
             self.publish_cmd(angular_vel=ang_vel)
             rospy.sleep(self.sleep_period)
         exit(0)
+
+    def set_aruco_detections(self, detection_state) -> bool:
+        """
+        Set aruco detections to True or False
+        :return : success
+        """
+        if self.cfg.debug_mode:
+            return True
+        else:
+            try:
+                rospy.wait_for_service('/enable_detections', timeout=3.0)
+                resp = self.__enable_detections_srv(detection_state)
+                rospy.loginfo("Enable detections response: " + resp.message)
+                return resp.success
+            except rospy.ServiceException as e:
+                rospy.logerr("Service call failed: " + str(e))
 
     def __pause_dock_cb(self, msg):
         self.is_pause = msg.data
