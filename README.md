@@ -116,14 +116,16 @@ autodock tb3 demo below. Once done with mapping, you can start with the `autodoc
 # 1. launch turtlebot3 gazebo world, and also autodock_server
 roslaunch autodock_sim tb3_nav_dock_sim.launch
 
-# 2. launch navigation stack, with provided map
+# 2. launch navigation stack, with provided map. You can also remap the environment by following the turtlebot sim tutorial
 ## New Terminal
 export TURTLEBOT3_MODEL=burger
-roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/map.yaml open_rviz:=0
+roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/catkin_ws/src/autodock/autodock_sim/maps/map.yaml open_rviz:=0
+```
 
-# 3. Now, localize the robot and move the robot around the world. 
-
-# 4. send a dock action. make sure that the robot's camera is facing the charger
+Now, localize the robot and move the robot with rviz.
+Move the robot as such that the camera is facing the charging station.
+```bash
+# 3. send a dock action. make sure that the robot's camera is facing the charger
 ## New Terminal
 rostopic pub /autodock_action/goal autodock_core/AutoDockingActionGoal {} --once
 ```
