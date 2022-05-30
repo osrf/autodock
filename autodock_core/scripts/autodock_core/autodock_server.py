@@ -110,10 +110,8 @@ class AutoDockServer:
         # create service client to 
         # 1. enable aruco detections only when action is started
         # 2. disable aruco detections when action is idle
-        self.__enable_detections_srv = rospy.ServiceProxy('/enable_detections', SetBool)
         # disable on initialize
         self.set_aruco_detections(detection_state=False)
-
         if run_server:
             self.__as = actionlib.SimpleActionServer(
                 "autodock_action",
@@ -356,8 +354,10 @@ class AutoDockServer:
             return True
         else:
             try:
-                rospy.wait_for_service('/enable_detections', timeout=3.0)
-                resp = self.__enable_detections_srv(detection_state)
+                detection_srv_name = "/enable_detections"
+                rospy.wait_for_service(detection_srv_name, timeout=3.0)
+                enable_detections_srv = rospy.ServiceProxy(detection_srv_name, SetBool)
+                resp = enable_detections_srv(detection_state)
                 rospy.loginfo("Enable detections response: " + resp.message)
                 return resp.success
             except rospy.ServiceException as e:
