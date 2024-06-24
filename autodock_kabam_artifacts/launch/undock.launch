@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="loop_rate" default="1.0" />      <!--loop_rate in 1 hz--> 
+    <node pkg="autodock_kabam" name="undock_node" type="undock_node.py" output="screen" respawn="false">
+        <param name="~loop_rate" value="$(arg loop_rate)"/>
+    </node>
+</launch>

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Run on vacuum_40 -->
+  <!-- Global param -->
+  <arg name="headless" default="false"/>
+  <arg name="use_sim_time" default="false"/>
+  <arg name="autodock_server" default="true"/>
+
+  <!-- Launch AutoDock Server Node -->
+  <group if="$(arg autodock_server)">
+    <include file="$(find autodock_core)/launch/autodock_server.launch">
+      <arg name="autodock_config" default="$(find autodock_kabam)/configs/vacuum40.yaml"/>
+      <arg name="use_fake_clock" default="true"/>
+    </include>
+  </group>
+
+  <!-- launch fiducial detect  -->
+  <node pkg="aruco_detect" name="aruco_detect"
+        type="aruco_detect" output="log" respawn="false">
+    <param name="/use_sim_time" value="false"/>
+    <param name="image_transport" value="compressed"/>
+    <param name="publish_images" value="true" />
+    <param name="dictionary" value="8"/>
+    <param name="do_pose_estimation" value="true"/>
+    <param name="verbose" value="false"/>
+    <!-- <param name="fiducial_len_override" value="10: 0.15, 11: 0.15, 20: 0.05"/> -->
+    <param name="fiducial_len_override" value="10: 0.10, 11: 0.10, 20: 0.05"/>
+    <remap from="camera/compressed" to="/rgb_image_hd2/compressed"/>
+    <remap from="camera_info" to="/filtered_camera_info"/>
+  </node>
+
+  <!-- camera_info_filtering  -->
+  <node type="camera_info_filter.py"
+        name="camera_info_filter" pkg="autodock_kabam" output="screen">
+    <param name="extract_frame_id" value="intrinsic_color2"/>
+    <param name="new_frame_id" value="back_camera_frame"/>
+  </node>
+
+  <!-- rviz viewer -->
+  <group unless="$(arg headless)">
+    <node type="rviz" name="rviz" pkg="rviz"
+      args="-d $(find autodock_kabam)/rviz/vacuum40.rviz" />
+  </group>
+
+  <!-- tf to place the camera to the correct tf frame -->
+  <node pkg="tf2_ros" 
+        type="static_transform_publisher"
+        name="cam_link_broadcaster"
+        args="0 0 .55 -1.57 0 -1.57 camera_link2 back_camera_frame"/>
+
+</launch>

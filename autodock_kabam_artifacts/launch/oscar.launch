@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Run on oscar robot -->
+  <!-- Global param -->
+  <arg name="headless" default="false"/>
+  <arg name="use_fake_clock" default="false"/>  <!-- Warning!! use this with caution, when time is off synced -->
+  <arg name="autodock_server" default="true"/>
+  <arg name="debug_mode" default="true" doc="Use this to have aruco detections always ON (publish fiducial images always) and other useful visualization markers. Turn OFF for better performance in deployment."/>
+
+  <!-- Launch AutoDock Server Node -->
+  <group if="$(arg autodock_server)">
+    <include file="$(find autodock_core)/launch/autodock_server.launch">
+      <arg name="autodock_config" default="$(find autodock_kabam)/configs/oscar.yaml"/>
+      <arg name="use_fake_clock" default="$(arg use_fake_clock)"/> <!-- Warning!! -->
+      <arg name="debug_mode" value="$(arg debug_mode)"/>
+    </include>
+  </group>
+
+  <!-- launch fiducial detect  -->
+  <node pkg="aruco_detect" name="aruco_detect"
+        type="aruco_detect" output="log" respawn="false">
+    <param name="/use_sim_time" value="false"/>
+    <param name="image_transport" value="compressed"/>
+    <param name="publish_images" value="true" />
+    <param name="dictionary" value="8"/>
+    <param name="do_pose_estimation" value="true"/>
+    <param name="verbose" value="false"/>
+    <param name="fiducial_len_override" value="10: 0.10, 11: 0.10, 20: 0.05"/>
+    <remap from="camera/compressed" to="/camera_dock/color/image_raw/compressed"/>
+    <remap from="camera_info" to="/camera_dock/color/camera_info"/>
+  </node>
+
+  <!-- WARN!!! Default off. This hack is to publish the fake /clock time,
+    dont use this if time is in-sync. This should be used with caution -->
+  <group if="$(arg use_fake_clock)">
+    <node type="camera_info_filter.py"
+          name="camera_info_filter" pkg="autodock_kabam" output="screen">
+      <param name="extract_frame_id" value="camera_dock_color_optical_frame"/>
+      <remap from="camera_info" to="/camera_dock/color/camera_info"/>
+    </node>
+  </group>
+
+  <!-- obstacle observer node  -->
+  <node type="obstacle_observer"
+        name="obstacle_observer" pkg="autodock_core" output="screen">
+    <param name="vicinity_radius" value="0.4"/>
+    <param name="coverage_percent" value="0.12"/>
+    <param name="occupancy_prob" value="60"/>
+    <param name="base_link_name" value="base_link"/>
+  </node>
+
+  <!-- rviz viewer -->
+  <group unless="$(arg headless)">
+    <node type="rviz" name="rviz" pkg="rviz"
+      args="-d $(find autodock_kabam)/rviz/oscar.rviz" />
+  </group>
+
+  <!-- Undock service-->
+  <include file="$(find autodock_kabam)/launch/undock.launch" />
+
+  <!-- tf to place the camera to the correct tf frame -->
+  <node pkg="tf2_ros" 
+        type="static_transform_publisher"
+        name="cam_link_broadcaster"
+        args="-0.54 0 .2 3.14 0 0 base_link camera_dock_link"/>
+
+</launch>
